@@ -1,0 +1,78 @@
+/******************************************************************************
+ * Config / Dev / Debug
+*******************************************************************************/
+@import "./reset";
+
+$red: #f30541;
+$teal: #2affea;
+$green: #10ff59;
+$pink: #f49ac1;
+$yellow: #eefd02;
+$purple: #6441a4;
+$blue: #1795d4;
+$white: #fff;
+$black: #000;
+$black075: rgba( 0, 0, 0, 0.75 );
+$black01: #111;
+$black02: #222;
+$black03: #333;
+$transform: 100px;
+$duration: 200ms;
+$marginHorz: 60px;
+$marginVert: 40px;
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+}
+
+body.dev {
+    background-color: $black;
+}
+
+
+
+/******************************************************************************
+ * HUD
+*******************************************************************************/
+.red {
+    color: $red;
+}
+.teal {
+    color: $teal;
+}
+.green {
+    color: $green;
+}
+.yellow {
+    color: $yellow;
+}
+.pink {
+    color: $pink;
+}
+.purple {
+    color: $purple;
+}
+.blue {
+    color: $blue;
+}
+.hud {}
+
+
+
+
+/******************************************************************************
+ * HUD FX Canvas
+*******************************************************************************/
+.hud__maze {
+    background-color: $black02;
+    box-shadow: 0 0 10px 5px rgba( 0, 0, 0, 0.25 );
+    height: 1080px;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate3d( -50%, -50%, 0 );
+    width: 1920px;
+    z-index: 1;
+}
