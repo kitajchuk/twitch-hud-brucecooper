@@ -13,7 +13,7 @@
         "watch": "./node_modules/.bin/webpack --env.sandbox --hide-modules --colors --watch",
         "postinstall": "cd ./node_modules/properjs-hobo && npm install && npm run build -- 'is eq not one next prev attr last first index parent filter detach append remove trigger prepend closest children removeAttr toggleClass'"
     },
-    "repository": "git@github.com:kitajchuk/twitch-hud-brucecooper.git",
+    "repository": "git@github.com:kitajchuk/twitch-hud-labyrinth.git",
     "license": "CC0-1.0",
     "contributors": [
         {

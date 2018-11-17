@@ -1,13 +1,14 @@
 import $ from "properjs-hobo";
 import Controller from "properjs-controller";
-import Stagger from "properjs-stagger";
 import socket from "../socket";
 
 
 
 const maze = {
     init () {
-        this.canvas = $( ".js-hud-maze" );
+        this.hud = $( ".js-hud" );
+        this.data = this.hud.data();
+        this.canvas = this.hud.find( ".js-hud-maze" );
         this.context = this.canvas[ 0 ].getContext( "2d" );
         this.cellauto = window.CellAuto;
         this.controller = new Controller();
@@ -16,16 +17,20 @@ const maze = {
         this.hero = {
             x: 0,
             y: 0,
-            color: "#2affea",
-            spawn: false
+            value: 1,
+            spawn: false,
+            sprite: this.hud.find( ".js-hud-hero" )
         };
         this.chest = {
             x: 0,
             y: 0,
-            color: "#6441a4",
-            spawn: false
+            value: 1,
+            spawn: false,
+            sprite: this.hud.find( ".js-hud-chest" )
         };
         this.isMoving = false;
+        this.tiles = new Image();
+        this.tiles.src = `/themes/${this.data.theme}/tiles.png`;
 
         return this;
     },
@@ -78,44 +83,52 @@ const maze = {
         }
 
         if ( points.length ) {
-            this.tick( this.players[ queueData.username ], points );
+            this.tick( this.players[ queueData.username ], queueData.direction, points );
 
         } else {
             this.isMoving = false;
         }
     },
 
-    tick ( player, points ) {
-        this.stagger = new Stagger({
-            steps: points.length,
-            delay: 250
-
-        }).step(( i ) => {
-            const point = points[ i ];
-            const cell = this.world.grid[ point.y ][ point.x ];
-            const color = cell.getColor();
+    tick ( player, direction, points ) {
+        const _walk = ( point ) => {
+            const newCell = this.world.grid[ point.y ][ point.x ];
+            const oldCell = this.world.grid[ this.hero.y ][ this.hero.x ];
 
             // redraw old block
-            this.fillCell( this.hero.x, this.hero.y, this.world.palette[ color ] );
+            this.drawTile( this.hero.x, this.hero.y, oldCell.getValue() );
             // redraw new block
-            this.fillCell( point.x, point.y, this.hero.color );
+            this.drawTile( point.x, point.y, newCell.getValue() );
             // update hero
             this.hero.x = point.x;
             this.hero.y = point.y;
+            this.hero.sprite[ 0 ].style.webkitTransform = `translate3d( ${this.world.cellSize * this.hero.x}px, ${this.world.cellSize * this.hero.y}px, 0 )`;
 
-            // chest collision
-            if ( point.chest ) {
-                this.stagger.pause();
-                this.stagger = null;
-                this.render();
+            setTimeout(() => {
+                // chest collision
+                if ( point.chest ) {
+                    this.hud.addClass( "dim" );
+                    this.hero.sprite.removeClass( "walk left right up down" ).addClass( "down" );
+                    this.render();
 
-                socket.emit( "mazerunner", player );
-            }
+                    socket.emit( "mazerunner", player );
 
-        }).done(() => {
-            this.isMoving = false;
+                // no more points
+                } else if ( !points.length ) {
+                    this.hero.sprite.removeClass( "walk" );
+                    this.isMoving = false;
 
-        }).start();
+                // walk it out
+                } else {
+                    _walk( points.shift() );
+                }
+
+            }, 240 );
+        };
+
+        this.hero.sprite.removeClass( "left right up down" ).addClass( `walk ${direction}` );
+
+        _walk( points.shift() );
     },
 
     spawn ( thing ) {
@@ -129,48 +142,49 @@ const maze = {
                 this[ thing ].x = x;
                 this[ thing ].y = y;
 
-                this.fillCell( this[ thing ].x, this[ thing ].y, this[ thing ].color );
+                this.drawTile( this[ thing ].x, this[ thing ].y, this[ thing ].value );
+                this[ thing ].sprite[ 0 ].style.webkitTransform = `translate3d( ${this.world.cellSize * this[ thing ].x}px, ${this.world.cellSize * this[ thing ].y}px, 0 )`;
             }
         }
     },
 
-    fillCell ( x, y, color ) {
+    /*
+    this.context.drawImage(
+        img/cvs,
+        mask-x,
+        mask-y,
+        mask-width,
+        mask-height,
+        x-position,
+        y-position,
+        width,
+        height
+    )
+    */
+    drawTile ( x, y, value ) {
         this.context.clearRect(
             x * this.world.cellSize,
             y * this.world.cellSize,
             this.world.cellSize,
             this.world.cellSize
         );
-        this.context.fillStyle = color;
-        this.context.fillRect(
-            x * this.world.cellSize,
-            y * this.world.cellSize,
+        this.context.drawImage(
+            this.tiles,
+            this.world.cellSize * value,
+            0,
+            this.world.cellSize,
+            this.world.cellSize,
+            (x * this.world.cellSize),
+            (y * this.world.cellSize),
             this.world.cellSize,
             this.world.cellSize
         );
     },
 
-    render () {
-        this.queue = [];
-        this.players = {};
-        this.hero.spawn = false;
-        this.chest.spawn = false;
-        this.isMoving = false;
-
-        this.world = new this.cellauto.World({
-            width: 64,
-            height: 36,
-            cellSize: 30
-        });
-
-        this.world.palette = [
-            "#333",
-            "#000"
-        ];
-
-        this.world.registerCellType( "living", {
-            getColor: function () {
-                return this.alive ? 0 : 1;
+    registerCellType ( type, value ) {
+        this.world.registerCellType( type, {
+            getValue: function () {
+                return this.alive ? 0 : value;
             },
             process: function ( neighbors ) {
                 const surrounding = this.countSurroundingCellsWithValue( neighbors, "wasAlive" );
@@ -193,11 +207,37 @@ const maze = {
             this.alive = Math.random() > 0.5;
             this.simulated = 0;
         });
+    },
+
+    render () {
+        this.queue = [];
+        this.players = {};
+        this.hero.spawn = false;
+        this.chest.spawn = false;
+        this.isMoving = false;
+
+        this.world = new this.cellauto.World({
+            width: 60,
+            height: 32,
+            cellSize: 32
+        });
+
+        this.registerCellType( "ground", 1 );
+        this.registerCellType( "flower", 2 );
+        this.registerCellType( "bush", 3 );
 
         this.world.initialize([
             {
-                name: "living",
-                distribution: 100
+                name: "ground",
+                distribution: 96
+            },
+            {
+                name: "flower",
+                distribution: 2
+            },
+            {
+                name: "bush",
+                distribution: 2
             }
         ]);
 
@@ -210,11 +250,11 @@ const maze = {
             for ( let y = 0; y < this.world.height; y++ ) {
                 for ( let x = 0; x < this.world.width; x++ ) {
                     const cell = this.world.grid[ y ][ x ];
-                    const color = cell.getColor();
+                    const value = cell.getValue();
 
-                    this.fillCell( x, y, this.world.palette[ color ] );
+                    this.drawTile( x, y, value );
 
-                    bytes.push( color );
+                    bytes.push( value );
                 }
             }
 
@@ -223,8 +263,9 @@ const maze = {
                 if ( this.bytes.join( "" ) === bytes.join( "" ) ) {
                     this.bytes = null;
                     this.controller.stop();
-                    this.spawn( "hero" );
                     this.spawn( "chest" );
+                    this.spawn( "hero" );
+                    this.hud.removeClass( "dim" );
                 }
             }
 

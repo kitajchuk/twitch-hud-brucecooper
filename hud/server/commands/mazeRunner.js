@@ -11,7 +11,7 @@
  */
 module.exports = {
     name: "mazeRunner",
-    regex: /^\!(left|right|up|down)$/,
+    regex: /^\!(left|right|up|down)\s(.*?)$/,
     memo: {},
     init ( app ) {
         this.app = app;
@@ -23,7 +23,7 @@ module.exports = {
             this.app.broadcast( "mazerunner", {
                 username: userstate.username,
                 direction: response.match[ 1 ],
-                distance: 1
+                distance: parseInt( response.match[ 2 ], 10 )
             });
         });
     },

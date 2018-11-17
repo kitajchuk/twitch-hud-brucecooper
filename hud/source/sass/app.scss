@@ -16,18 +16,11 @@ $black075: rgba( 0, 0, 0, 0.75 );
 $black01: #111;
 $black02: #222;
 $black03: #333;
-$transform: 100px;
-$duration: 200ms;
-$marginHorz: 60px;
-$marginVert: 40px;
 
 html,
 body {
     height: 100%;
     width: 100%;
-}
-
-body.dev {
     background-color: $black;
 }
 
@@ -36,43 +29,138 @@ body.dev {
 /******************************************************************************
  * HUD
 *******************************************************************************/
-.red {
-    color: $red;
-}
-.teal {
-    color: $teal;
-}
-.green {
-    color: $green;
-}
-.yellow {
-    color: $yellow;
-}
-.pink {
-    color: $pink;
-}
-.purple {
-    color: $purple;
-}
-.blue {
-    color: $blue;
-}
-.hud {}
-
-
-
-
-/******************************************************************************
- * HUD FX Canvas
-*******************************************************************************/
-.hud__maze {
-    background-color: $black02;
+.hud {
+    background-color: $black;
     box-shadow: 0 0 10px 5px rgba( 0, 0, 0, 0.25 );
-    height: 1080px;
+    height: 1024px;
     position: fixed;
     left: 50%;
     top: 50%;
     transform: translate3d( -50%, -50%, 0 );
     width: 1920px;
     z-index: 1;
+
+    &[data-theme="pokemon"] {
+        .hud__hero:after {
+            background-image: url( "/themes/pokemon/hero.png" );
+            background-repeat: no-repeat;
+            background-size: 128px 384px;
+        }
+        .hud__chest:after {
+            background-image: url( "/themes/pokemon/chest.png" );
+            background-repeat: no-repeat;
+            background-size: 32px 64px;
+            background-position: 0 0;
+        }
+    }
+}
+.hud__maze {
+    background-color: $black;
+    height: 1024px;
+    width: 1920px;
+    position: relative;
+}
+.hud__hero {
+    height: 32px;
+    width: 32px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: transform 240ms ease;
+
+    .dim & {
+        display: none;
+    }
+
+    &:after {
+        content: "";
+        height: 64px;
+        width: 32px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        transform: translate3d( 0, -32px, 0 );
+    }
+
+    &.left:after {
+        background-position: -64px -0px;
+    }
+    &.right:after {
+        background-position: -96px -0px;
+    }
+    &.up:after {
+        background-position: -32px -0px;
+    }
+    &.down:after {
+        background-position: -0px -0px;
+    }
+    &.walk:after {
+        animation-duration: 240ms;
+        animation-iteration-count: infinite;
+    }
+    &.walk.left:after {
+        animation-name: walk-left;
+    }
+    &.walk.right:after {
+        animation-name: walk-right;
+    }
+    &.walk.up:after {
+        animation-name: walk-up;
+    }
+    &.walk.down:after {
+        animation-name: walk-down;
+    }
+}
+.hud__chest {
+    height: 32px;
+    width: 32px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: transform 240ms ease;
+
+    .dim & {
+        display: none;
+    }
+
+    &:after {
+        content: "";
+        height: 64px;
+        width: 32px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        transform: translate3d( 0, -32px, 0 );
+    }
+}
+
+
+
+@keyframes walk-up {
+    0% { background-position: -32px -64px; }
+    49.99999% { background-position: -32px -64px; }
+    50% { background-position: -32px -128px; }
+    99.99999% { background-position: -32px -128px; }
+    100% { background-position: -32px -0px; }
+}
+@keyframes walk-down {
+    0% { background-position: -0px -64px; }
+    49.99999% { background-position: -0px -64px; }
+    50% { background-position: -0px -128px; }
+    99.99999% { background-position: -0px -128px; }
+    100% { background-position: -0px -0px; }
+}
+@keyframes walk-left {
+    0% { background-position: -64px -64px; }
+    49.99999% { background-position: -64px -64px; }
+    50% { background-position: -64px -128px; }
+    99.99999% { background-position: -64px -128px; }
+    100% { background-position: -64px -0px; }
+}
+@keyframes walk-right {
+    0% { background-position: -96px -64px; }
+    49.99999% { background-position: -96px -64px; }
+    50% { background-position: -96px -128px; }
+    99.99999% { background-position: -96px -128px; }
+    100% { background-position: -96px -0px; }
 }

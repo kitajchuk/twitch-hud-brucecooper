@@ -79,7 +79,7 @@ app.express.use( express.static( path.join( __dirname, "../public" ) ) );
 // {app} Express routes
 app.express.get( "/", ( req, res ) => {
     const data = {
-        dev: app.dev || req.query.dev
+        theme: app.config.all.mazeTheme
     };
 
     res.render( "index", data );
