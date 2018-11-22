@@ -43,18 +43,21 @@ body {
     &[data-theme="pokemon"] {
         .hud__hero:after {
             background-image: url( "/themes/pokemon/hero.png" );
-            background-repeat: no-repeat;
-            background-size: 128px 384px;
         }
         .hud__chest:after {
             background-image: url( "/themes/pokemon/chest.png" );
-            background-repeat: no-repeat;
-            background-size: 32px 64px;
-            background-position: 0 0;
+        }
+    }
+    &[data-theme="zelda"] {
+        .hud__hero:after {
+            background-image: url( "/themes/zelda/hero.png" );
+        }
+        .hud__chest:after {
+            background-image: url( "/themes/zelda/chest.png" );
         }
     }
 }
-.hud__maze {
+.hud__labyrinth {
     background-color: $black;
     height: 1024px;
     width: 1920px;
@@ -80,6 +83,8 @@ body {
         left: 0;
         top: 0;
         transform: translate3d( 0, -32px, 0 );
+        background-repeat: no-repeat;
+        background-size: 128px 384px;
     }
 
     &.left:after {
@@ -131,6 +136,9 @@ body {
         left: 0;
         top: 0;
         transform: translate3d( 0, -32px, 0 );
+        background-repeat: no-repeat;
+        background-size: 32px 64px;
+        background-position: 0 0;
     }
 }
 

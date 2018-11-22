@@ -1,5 +1,5 @@
 // import $ from "properjs-hobo";
-import maze from "./lib/maze";
+import labyrinth from "./lib/labyrinth";
 
 
 
@@ -24,15 +24,15 @@ const socket = {
             const response = JSON.parse( message.data );
 
             // HUD::events
-            if ( response.event === "maze" ) {
-                maze.render();
+            if ( response.event === "labyrinth-render" ) {
+                labyrinth.render();
 
-            } else if ( response.event === "mazerunner" ) {
-                maze.push( response.data );
+            } else if ( response.event === "labyrinth-command" ) {
+                labyrinth.push( response.data );
             }
         };
         this.websocket.onopen = () => {
-            this.app.maze = maze.init();
+            this.app.labyrinth = labyrinth.init();
         };
         this.websocket.onclose = () => {};
     }

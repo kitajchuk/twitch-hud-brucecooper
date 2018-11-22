@@ -4,16 +4,14 @@ import socket from "../socket";
 
 
 
-const maze = {
+const labyrinth = {
     init () {
         this.hud = $( ".js-hud" );
         this.data = this.hud.data();
-        this.canvas = this.hud.find( ".js-hud-maze" );
+        this.canvas = this.hud.find( ".js-hud-labyrinth" );
         this.context = this.canvas[ 0 ].getContext( "2d" );
         this.cellauto = window.CellAuto;
         this.controller = new Controller();
-        this.queue = [];
-        this.players = {};
         this.hero = {
             x: 0,
             y: 0,
@@ -38,34 +36,20 @@ const maze = {
     push ( data ) {
         if ( !this.isMoving ) {
             this.isMoving = true;
-            this.queue.push( data );
-            this.move();
+            this.move( data );
         }
     },
 
-    move () {
-        const queueData = this.queue.shift();
-        const increment = (queueData.direction === "left" || queueData.direction === "up" ? -1 : 1);
+    move ( data ) {
+        const increment = (data.direction === "left" || data.direction === "up" ? -1 : 1);
         const points = [];
         let i = 0;
 
-        // Player has not made a move yet
-        if ( !this.players[ queueData.username ] ) {
-            this.players[ queueData.username ] = {
-                username: queueData.username,
-                moves: 0
-            };
-
-        // Increment players move count for this maze
-        } else {
-            this.players[ queueData.username ].moves++;
-        }
-
-        while ( i < queueData.distance ) {
+        while ( i < data.distance ) {
             i++;
 
-            const x = (queueData.direction === "left" || queueData.direction === "right" ? (this.hero.x + (increment * i)) : this.hero.x);
-            const y = (queueData.direction === "up" || queueData.direction === "down" ? (this.hero.y + (increment * i)) : this.hero.y);
+            const x = (data.direction === "left" || data.direction === "right" ? (this.hero.x + (increment * i)) : this.hero.x);
+            const y = (data.direction === "up" || data.direction === "down" ? (this.hero.y + (increment * i)) : this.hero.y);
             const cell = this.world.grid[ y ][ x ];
 
             // Point is in bounds and not alive
@@ -83,14 +67,14 @@ const maze = {
         }
 
         if ( points.length ) {
-            this.tick( this.players[ queueData.username ], queueData.direction, points );
+            this.tick( data, points );
 
         } else {
             this.isMoving = false;
         }
     },
 
-    tick ( player, direction, points ) {
+    tick ( data, points ) {
         const _walk = ( point ) => {
             const newCell = this.world.grid[ point.y ][ point.x ];
             const oldCell = this.world.grid[ this.hero.y ][ this.hero.x ];
@@ -110,13 +94,13 @@ const maze = {
                     this.hud.addClass( "dim" );
                     this.hero.sprite.removeClass( "walk left right up down" ).addClass( "down" );
                     this.render();
-
-                    socket.emit( "mazerunner", player );
+                    socket.emit( "labyrinth-winner", data );
 
                 // no more points
                 } else if ( !points.length ) {
                     this.hero.sprite.removeClass( "walk" );
                     this.isMoving = false;
+                    socket.emit( "labyrinth-moved", data );
 
                 // walk it out
                 } else {
@@ -126,7 +110,7 @@ const maze = {
             }, 240 );
         };
 
-        this.hero.sprite.removeClass( "left right up down" ).addClass( `walk ${direction}` );
+        this.hero.sprite.removeClass( "left right up down" ).addClass( `walk ${data.direction}` );
 
         _walk( points.shift() );
     },
@@ -210,12 +194,9 @@ const maze = {
     },
 
     render () {
-        this.queue = [];
-        this.players = {};
         this.hero.spawn = false;
         this.chest.spawn = false;
         this.isMoving = false;
-
         this.world = new this.cellauto.World({
             width: 60,
             height: 32,
@@ -259,7 +240,7 @@ const maze = {
             }
 
             if ( this.bytes ) {
-                // When the old bytes matches the new bytes the maze is done
+                // When the old bytes matches the new bytes the labyrinth is done
                 if ( this.bytes.join( "" ) === bytes.join( "" ) ) {
                     this.bytes = null;
                     this.controller.stop();
@@ -276,4 +257,4 @@ const maze = {
 
 
 
-export default maze;
+export default labyrinth;

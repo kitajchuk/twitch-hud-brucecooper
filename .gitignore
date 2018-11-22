@@ -20,8 +20,7 @@
 hud/public/js
 hud/public/css
 hud/public/media
-hud/server/json
-hub/server/data
+hud/json
 config.js
 
 

@@ -51,7 +51,6 @@ module.exports = {
 
             // Chat
             this.memo.client.on( "chat", ( channel, userstate, message, self ) => {
-                console.log( userstate );
                 this.app.commands.forEach(( command ) => {
                     command.exec(
                         this.memo.client,

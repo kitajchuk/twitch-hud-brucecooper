@@ -8,7 +8,6 @@
     "main": "hud/main.js",
     "scripts": {
         "start": "./node_modules/.bin/nodemon -i ./hud/source -i ./hud/public -i ./hud/views -i ./hud/server/json -i ./node_modules ./hud/main.js",
-        "start:dev": "./node_modules/.bin/nodemon -i ./hud/source -i ./hud/public -i ./hud/views -i ./hud/server/json -i ./node_modules ./hud/main.js -- 'dev'",
         "build": "./node_modules/.bin/webpack --env.production --progress --profile --display-modules --colors",
         "watch": "./node_modules/.bin/webpack --env.sandbox --hide-modules --colors --watch",
         "postinstall": "cd ./node_modules/properjs-hobo && npm install && npm run build -- 'is eq not one next prev attr last first index parent filter detach append remove trigger prepend closest children removeAttr toggleClass'"

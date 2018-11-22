@@ -11,10 +11,8 @@ const WebSocketClient = require( "websocket" ).client;
 const crypto = require( "crypto" );
 
 // Load lib
-const files = require( "../../files" );
 const config = require( "../../config" );
 const twitch = require( "./twitch/index" );
-const oauthFile = path.join( __dirname, "json/oauth.json" );
 
 // This {app}
 const app = {};
@@ -22,7 +20,6 @@ const app = {};
 
 
 // {app} Config
-app.dev = (process.argv.pop() === "dev" ? true : false);
 app.commands = require( "./commands/index" );
 app.twitch = twitch;
 app.lager = lager;
@@ -47,7 +44,7 @@ app.runCommand = ( comm, message ) => {
         app.commands.forEach(( command ) => {
             const match = message.match( command.regex );
 
-            if ( /*app.gameon &&*/ match && command.name === comm ) {
+            if ( match && command.name === comm ) {
                 resolve({
                     match
                 });
@@ -79,7 +76,7 @@ app.express.use( express.static( path.join( __dirname, "../public" ) ) );
 // {app} Express routes
 app.express.get( "/", ( req, res ) => {
     const data = {
-        theme: app.config.all.mazeTheme
+        theme: app.config.all.theme
     };
 
     res.render( "index", data );
@@ -111,14 +108,17 @@ app.websocketserver.on( "connect", ( connection ) => {
 
     app.connections.push( connection );
 
-    app.broadcast( "maze", {} );
+    app.broadcast( "labyrinth-render", {} );
 
     connection.on( "message", ( message ) => {
         // { event, data }
         const utf8Data = JSON.parse( message.utf8Data );
 
-        if ( utf8Data.event === "mazerunner" ) {
-            app.getCommand( "mazeRunner" ).update( utf8Data.data );
+        if ( utf8Data.event === "labyrinth-moved" ) {
+            app.getCommand( "labyrinth" ).update( utf8Data.data );
+
+        } if ( utf8Data.event === "labyrinth-winner" ) {
+            app.getCommand( "labyrinth" ).winner( utf8Data.data );
         }
     });
 });
