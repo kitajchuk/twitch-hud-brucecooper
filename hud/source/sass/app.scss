@@ -16,6 +16,10 @@ $black075: rgba( 0, 0, 0, 0.75 );
 $black01: #111;
 $black02: #222;
 $black03: #333;
+$transform: 100px;
+$duration: 200ms;
+
+
 
 html,
 body {
@@ -27,18 +31,82 @@ body {
 
 
 /******************************************************************************
+ * Fonts
+*******************************************************************************/
+@font-face {
+    font-family: "Calamity-Regular";
+    src: url( "/fonts/Calamity-Regular.woff" ) format( "woff" );
+    font-style: normal;
+    font-stretch: normal;
+}
+@font-face {
+    font-family: "Calamity-Bold";
+    src: url( "/fonts/Calamity-Bold.woff" ) format( "woff" );
+    font-style: normal;
+    font-stretch: normal;
+}
+
+
+
+/******************************************************************************
+ * Colors
+*******************************************************************************/
+.red {
+    color: $red;
+}
+.teal {
+    color: $teal;
+}
+.green {
+    color: $green;
+}
+.yellow {
+    color: $yellow;
+}
+.pink {
+    color: $pink;
+}
+.purple {
+    color: $purple;
+}
+.blue {
+    color: $blue;
+}
+
+
+
+/******************************************************************************
  * HUD
 *******************************************************************************/
 .hud {
+    // Typography
+    color: $white;
+    font-family: "Calamity-Bold";
+    font-size: 22px;
+    line-height: 1.5;
+
+    // Gameplay
     background-color: $black;
     box-shadow: 0 0 10px 5px rgba( 0, 0, 0, 0.25 );
     height: 1024px;
     position: fixed;
     left: 50%;
-    top: 50%;
-    transform: translate3d( -50%, -50%, 0 );
+    bottom: 0;
+    transform: translate3d( -50%, 0, 0 );
     width: 1920px;
     z-index: 1;
+    pointer-events: none;
+
+    h1, h2, h3, h4, h5, h6 {
+        font-size: 28px;
+    }
+    h2, h3, h4, h5, h6 {
+        font-size: 24px;
+    }
+
+    .mono {
+        font-family: monospace;
+    }
 
     &[data-theme="pokemon"] {
         .hud__hero:after {
@@ -78,23 +146,23 @@ body {
     &:after {
         content: "";
         height: 64px;
-        width: 32px;
+        width: 38px;
         position: absolute;
         left: 0;
         top: 0;
         transform: translate3d( 0, -32px, 0 );
         background-repeat: no-repeat;
-        background-size: 128px 384px;
+        background-size: 152px 384px;
     }
 
     &.left:after {
-        background-position: -64px -0px;
+        background-position: -76px -0px;
     }
     &.right:after {
-        background-position: -96px -0px;
+        background-position: -114px -0px;
     }
     &.up:after {
-        background-position: -32px -0px;
+        background-position: -38px -0px;
     }
     &.down:after {
         background-position: -0px -0px;
@@ -141,15 +209,27 @@ body {
         background-position: 0 0;
     }
 }
+.hud__info {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    transform: translate3d( 0, -100%, 0 );
+    height: 56px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+}
 
 
 
 @keyframes walk-up {
-    0% { background-position: -32px -64px; }
-    49.99999% { background-position: -32px -64px; }
-    50% { background-position: -32px -128px; }
-    99.99999% { background-position: -32px -128px; }
-    100% { background-position: -32px -0px; }
+    0% { background-position: -38px -64px; }
+    49.99999% { background-position: -38px -64px; }
+    50% { background-position: -38px -128px; }
+    99.99999% { background-position: -38px -128px; }
+    100% { background-position: -38px -0px; }
 }
 @keyframes walk-down {
     0% { background-position: -0px -64px; }
@@ -159,16 +239,86 @@ body {
     100% { background-position: -0px -0px; }
 }
 @keyframes walk-left {
-    0% { background-position: -64px -64px; }
-    49.99999% { background-position: -64px -64px; }
-    50% { background-position: -64px -128px; }
-    99.99999% { background-position: -64px -128px; }
-    100% { background-position: -64px -0px; }
+    0% { background-position: -76px -64px; }
+    49.99999% { background-position: -76px -64px; }
+    50% { background-position: -76px -128px; }
+    99.99999% { background-position: -76px -128px; }
+    100% { background-position: -76px -0px; }
 }
 @keyframes walk-right {
-    0% { background-position: -96px -64px; }
-    49.99999% { background-position: -96px -64px; }
-    50% { background-position: -96px -128px; }
-    99.99999% { background-position: -96px -128px; }
-    100% { background-position: -96px -0px; }
+    0% { background-position: -114px -64px; }
+    49.99999% { background-position: -114px -64px; }
+    50% { background-position: -114px -128px; }
+    99.99999% { background-position: -114px -128px; }
+    100% { background-position: -114px -0px; }
+}
+
+
+
+/******************************************************************************
+ * HUD Alerts
+*******************************************************************************/
+.hud__alert {
+    align-items: flex-start;
+    background-color: $black075;
+    border-radius: 200px;
+    display: flex;
+    left: 50%;
+    opacity: 0;
+    padding: 50px 150px;
+    position: fixed;
+    top: 50%;
+    transform: translate3d( -50%, -50%, 0 );
+    transition: transform $duration ease,
+                opacity $duration ease;
+
+    h1, p,
+    .hud__alert__bot {
+        opacity: 0;
+        transition: transform $duration ease,
+                    opacity $duration ease;
+    }
+
+    h1 {
+        transform: translate3d( 0, $transform, 0 );
+    }
+
+    p {
+        max-width: 100%;
+        transform: translate3d( 0, $transform * 2, 0 );
+        width: 600px;
+    }
+
+    &.is-active {
+        opacity: 1;
+        transform: translate3d( -50%, -50%, 0 );
+
+        h1, p {
+            opacity: 1;
+            transform: translate3d( 0, 0, 0 );
+        }
+        .hud__alert__bot {
+            opacity: 1;
+            transform: translate3d( 100px, -50%, 0 );
+        }
+    }
+}
+.hud__alert__bot {
+    font-size: 20px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    opacity: 0;
+    transform: translate3d( 100px, -100% , 0 );
+}
+.hud__alert__msg,
+.hud__alert__icon {
+    display: inline-block;
+    vertical-align: top;
+}
+.hud__alert__icon {
+    height: 128px;
+    margin-right: 20px;
+    width: 128px;
+        display: none;
 }

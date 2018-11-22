@@ -1,4 +1,4 @@
-"use strict";
+// "use strict";
 
 
 
@@ -7,6 +7,7 @@ const path = require( "path" );
 const lager = require( "properjs-lager" );
 const files = require( "../files" );
 const jsonFile = path.join( __dirname, "../../json/labyrinth.json" );
+const alerts = require( "../alerts" );
 
 
 
@@ -22,7 +23,7 @@ const jsonFile = path.join( __dirname, "../../json/labyrinth.json" );
  */
 module.exports = {
     name: "labyrinth",
-    regex: /^\!(left|right|up|down)$|^\!(left|right|up|down)\s(\d{1,})$/,
+    regex: /^\!(left|right|up|down)$|^\!(left|right|up|down)(\d{1,})$|^\!(left|right|up|down)\s(\d{1,})$/,
     memo: {
         moving: false,
         json: files.read( jsonFile, true )
@@ -36,13 +37,13 @@ module.exports = {
     exec ( client, bot, channel, userstate, message, self, tmi ) {
         this.app.runCommand( this.name, message ).then(( response ) => {
             // lager.data( userstate );
-            // lager.data( response );
+            lager.data( response );
 
             if ( !this.memo.moving ) {
                 this.memo.moving = true;
 
-                const direction = response.match[ 1 ] || response.match[ 2 ];
-                const distance = response.match[ 3 ] ? Number( response.match[ 3 ] ) : 1;
+                const direction = response.match[ 1 ] || response.match[ 2 ] || response.match[ 4 ];
+                const distance = (response.match[ 3 ] || response.match[ 5 ]) ? Number( (response.match[ 3 ] || response.match[ 5 ]) ) : 1;
 
                 lager.data({
                     user: userstate.username,
@@ -54,6 +55,11 @@ module.exports = {
                     userstate,
                     direction,
                     distance
+                });
+
+                this.app.broadcast( "labyrinth-alert", {
+                    alertInfo: true,
+                    alertHtml: alerts.labyrinthCommand( userstate, direction, distance )
                 });
 
             } else {

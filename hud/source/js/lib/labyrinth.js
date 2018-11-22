@@ -70,7 +70,13 @@ const labyrinth = {
             this.tick( data, points );
 
         } else {
-            this.isMoving = false;
+            this.tick( data, [
+                {
+                    x: this.hero.x,
+                    y: this.hero.y,
+                    chest: false
+                }
+            ]);
         }
     },
 

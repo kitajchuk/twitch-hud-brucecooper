@@ -13,9 +13,14 @@ const crypto = require( "crypto" );
 // Load lib
 const config = require( "../../config" );
 const twitch = require( "./twitch/index" );
+const alerts = require( "./alerts" );
 
 // This {app}
 const app = {};
+const items = {
+    zelda: "Chest",
+    pokemon: "Pokeball"
+};
 
 
 
@@ -24,12 +29,16 @@ app.commands = require( "./commands/index" );
 app.twitch = twitch;
 app.lager = lager;
 app.config = config;
+app.alerts = alerts;
 app.connections = [];
 app.init = () => {
     // Initialize commands
     app.commands.forEach(( command ) => {
         command.init( app );
     });
+
+    // Initialize alerts
+    alerts.init( app );
 
     // Initialize server
     app.server.listen( config.hud.port );
@@ -109,6 +118,9 @@ app.websocketserver.on( "connect", ( connection ) => {
     app.connections.push( connection );
 
     app.broadcast( "labyrinth-render", {} );
+    app.broadcast( "labyrinth-alert", {
+        alertHtml: alerts.labyrinthRender( items[ app.config.all.theme ] )
+    });
 
     connection.on( "message", ( message ) => {
         // { event, data }
@@ -119,6 +131,9 @@ app.websocketserver.on( "connect", ( connection ) => {
 
         } if ( utf8Data.event === "labyrinth-winner" ) {
             app.getCommand( "labyrinth" ).winner( utf8Data.data );
+            app.broadcast( "labyrinth-alert", {
+                alertHtml: alerts.labyrinthWinner( utf8Data.data.userstate, items[ app.config.all.theme ] )
+            });
         }
     });
 });

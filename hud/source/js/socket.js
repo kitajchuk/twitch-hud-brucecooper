@@ -1,5 +1,6 @@
 // import $ from "properjs-hobo";
 import labyrinth from "./lib/labyrinth";
+import alert from "./lib/alert";
 
 
 
@@ -29,9 +30,13 @@ const socket = {
 
             } else if ( response.event === "labyrinth-command" ) {
                 labyrinth.push( response.data );
+
+            } else if ( response.event === "labyrinth-alert" ) {
+                alert.push( response.data );
             }
         };
         this.websocket.onopen = () => {
+            this.app.alert = alert.init();
             this.app.labyrinth = labyrinth.init();
         };
         this.websocket.onclose = () => {};
