@@ -11,16 +11,12 @@ const WebSocketClient = require( "websocket" ).client;
 const crypto = require( "crypto" );
 
 // Load lib
-const config = require( "../../config" );
 const twitch = require( "./twitch/index" );
 const alerts = require( "./alerts" );
+const config = require( "./config" );
 
 // This {app}
 const app = {};
-const items = {
-    zelda: "Chest",
-    pokemon: "Pokeball"
-};
 
 
 
@@ -83,12 +79,22 @@ app.express.use( express.static( path.join( __dirname, "../public" ) ) );
 
 
 // {app} Express routes
-app.express.get( "/", ( req, res ) => {
-    const data = {
-        theme: app.config.all.theme
-    };
+app.express.get( "/", ( req, res, next ) => {
+    if ( req.query.channel && req.query.token && req.query.theme ) {
+        app.config.auth.userName = req.query.channel;
+        app.config.auth.userChannel = `#${req.query.channel}`;
+        app.config.auth.userToken = req.query.token;
+        app.config.auth.theme = req.query.theme;
+        next();
 
-    res.render( "index", data );
+    } else {
+        res.render( "index" );
+    }
+
+}, ( req, res ) => {
+    res.render( "labyrinth", {
+        theme: app.config.auth.theme
+    });
 });
 
 
@@ -106,7 +112,7 @@ app.websocketserver = new WebSocketServer({
 app.websocketserver.on( "request", ( request ) => {
     lager.cache( `[socketserver] requested ${request.origin}` );
 
-    if ( request.origin === config.hud.url ) {
+    if ( request.origin === config.hud.local || request.origin === config.hud.live ) {
         request.accept( "echo-protocol", request.origin );
 
         twitch.tmi.init( app );
@@ -119,7 +125,7 @@ app.websocketserver.on( "connect", ( connection ) => {
 
     app.broadcast( "labyrinth-render", {} );
     app.broadcast( "labyrinth-alert", {
-        alertHtml: alerts.labyrinthRender( items[ app.config.all.theme ] )
+        alertHtml: alerts.labyrinthRender( config.items[ app.config.auth.theme ] )
     });
 
     connection.on( "message", ( message ) => {
@@ -132,7 +138,7 @@ app.websocketserver.on( "connect", ( connection ) => {
         } if ( utf8Data.event === "labyrinth-winner" ) {
             app.getCommand( "labyrinth" ).winner( utf8Data.data );
             app.broadcast( "labyrinth-alert", {
-                alertHtml: alerts.labyrinthWinner( utf8Data.data.userstate, items[ app.config.all.theme ] )
+                alertHtml: alerts.labyrinthWinner( utf8Data.data.userstate, config.items[ app.config.auth.theme ] )
             });
         }
     });

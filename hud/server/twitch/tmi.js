@@ -20,30 +20,34 @@ const tmi = require( "tmi.js" );
 module.exports = {
     name: "twitch tmi",
     memo: {},
+
     init ( app ) {
-        if ( !this.memo.client && !this.memo.bot ) {
+        if ( !this.memo.client ) {
             this.app = app;
+
             this.initMe();
 
             this.app.lager.server( `[${this.name}] utility initialized` );
         }
     },
+
     emitMe ( message ) {
-        this.memo.client.say( `#${this.app.config.all.userName}`, message );
+        this.memo.client.say( `#${this.app.config.auth.userName}`, message );
     },
+
     initMe () {
         this.memo.client = new tmi.client({
             options: {
-                clientId: this.app.config.all.clientId
+                clientId: this.app.config.auth.clientId
             },
             connection: {
                 reconnect: true
             },
             identity: {
-                username: this.app.config.all.userName,
-                password: this.app.config.all.userToken
+                username: this.app.config.auth.userName,
+                password: this.app.config.auth.userToken
             },
-            channels: [this.app.config.all.userChannel]
+            channels: [this.app.config.auth.userChannel]
         });
 
         this.memo.client.connect().then(( foo ) => {

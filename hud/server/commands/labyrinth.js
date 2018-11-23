@@ -78,7 +78,7 @@ module.exports = {
 
     winner ( data ) {
         const entry = this.memo.json.find(( entry ) => {
-            return (entry.userstate.id === data.userstate.id);
+            return (entry.userstate.username === data.userstate.username);
         });
 
         // Push new entry

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>// Labyrinth Maze //</title>
+        <link rel="stylesheet" media="screen" href="/css/app.css" />
+    </head>
+    <body>
+        <div class="hud js-hud dim" data-theme="<%= locals.theme %>">
+            <canvas class="hud__labyrinth js-hud-labyrinth" id="maze" width="1920" height="1024"></canvas>
+            <div class="hud__chest js-hud-chest"></div>
+            <div class="hud__hero js-hud-hero down"></div>
+            <div class="hud__alert js-hud-alert">
+                <div class="hud__alert__bot">Labyrinth</div>
+                <img src="" class="hud__alert__icon" width="128" height="128" />
+                <div class="hud__alert__msg js-hud-alert-msg"></div>
+            </div>
+            <div class="hud__info js-hud-info">
+                <p>Waiting for players&hellip;</p>
+            </div>
+        </div>
+        <script src="/js/cellauto.js"></script>
+        <script src="/js/app.js"></script>
+    </body>
+</html>
