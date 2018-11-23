@@ -6,6 +6,7 @@ const alert = {
     init () {
         this.alertBox = $( ".js-hud-alert" );
         this.alertMsg = this.alertBox.find( ".js-hud-alert-msg" );
+        this.alertImg = this.alertBox.find( ".js-hud-alert-img" );
         this.alertInfo = $( ".js-hud-info" );
         this.queue = [];
         this.isFlashing = false;
@@ -16,10 +17,15 @@ const alert = {
     },
 
     push ( data ) {
-        this.queue.push( data );
+        if ( data.alertInfo ) {
+            this.alertInfo[ 0 ].innerHTML = data.alertHtml;
 
-        if ( !this.isFlashing ) {
-            this.fire();
+        } else {
+            this.queue.push( data );
+
+            if ( !this.isFlashing ) {
+                this.fire();
+            }
         }
     },
 
@@ -27,18 +33,17 @@ const alert = {
         // Since we `push` onto the bottom of the stack we pull from the top
         const queueData = this.queue.shift();
 
-        if ( queueData.alertInfo ) {
-            this.alertInfo[ 0 ].innerHTML = queueData.alertHtml;
-
-        } else {
-            this.isFlashing = true;
-            this.alertMsg[ 0 ].innerHTML = queueData.alertHtml;
-            this.alertBox.addClass( "is-active" );
-            this.timeout = setTimeout(() => {
-                this.hide();
-
-            }, this.duration );
+        this.isFlashing = true;
+        this.alertMsg[ 0 ].innerHTML = queueData.alertHtml;
+        if ( queueData.alertImg ) {
+            this.alertBox.addClass( "is-image" );
+            this.alertImg[ 0 ].src = queueData.alertImg;
         }
+        this.alertBox.addClass( "is-active" );
+        this.timeout = setTimeout(() => {
+            this.hide();
+
+        }, this.duration );
     },
 
     show ( data ) {
@@ -56,6 +61,9 @@ const alert = {
 
             } else {
                 this.isFlashing = false;
+                this.alertImg[ 0 ].src = "";
+                this.alertMsg[ 0 ].innerHTML = "";
+                this.alertBox.removeClass( "is-image" );
             }
 
         }, 200 );

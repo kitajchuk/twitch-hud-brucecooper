@@ -12,7 +12,7 @@ module.exports = {
 
     labyrinthRender ( item ) {
         return `
-            <h1 class="teal">Quest</h1>
+            <h1 class="teal">Objective</h1>
             <p>The first player to reach the <span class="teal">${item}</span> wins!</p>
         `;
     },
@@ -27,6 +27,13 @@ module.exports = {
         return `
             <h1 class="teal">Excellent</h1>
             <p><span class="teal">${userstate.username}</span> got to the <span class="teal">${item}</span> first!</p>
+        `;
+    },
+
+    labyrinthPokedex ( userstate, pokemon ) {
+        return `
+            <h1 class="teal">Excellent</h1>
+            <p><span class="teal">${userstate.username}</span>, a wild <span class="teal">${pokemon}</span> was added to your Pokedex!</p>
         `;
     }
 };

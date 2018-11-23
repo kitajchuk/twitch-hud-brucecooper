@@ -123,6 +123,7 @@ app.websocketserver.on( "connect", ( connection ) => {
 
     app.connections.push( connection );
 
+    app.getCommand( "labyrinth" ).reset();
     app.broadcast( "labyrinth-render", {} );
     app.broadcast( "labyrinth-alert", {
         alertHtml: alerts.labyrinthRender( config.items[ app.config.auth.theme ] )
@@ -133,12 +134,27 @@ app.websocketserver.on( "connect", ( connection ) => {
         const utf8Data = JSON.parse( message.utf8Data );
 
         if ( utf8Data.event === "labyrinth-moved" ) {
-            app.getCommand( "labyrinth" ).update( utf8Data.data );
+            app.getCommand( "labyrinth" ).reset();
 
         } if ( utf8Data.event === "labyrinth-winner" ) {
-            app.getCommand( "labyrinth" ).winner( utf8Data.data );
-            app.broadcast( "labyrinth-alert", {
-                alertHtml: alerts.labyrinthWinner( utf8Data.data.userstate, config.items[ app.config.auth.theme ] )
+            app.getCommand( "labyrinth" ).winner( utf8Data.data ).then(( pokemon ) => {
+                app.broadcast( "labyrinth-alert", {
+                    alertInfo: true,
+                    alertHtml: `<p>Waiting for players&hellip;</p>`
+                });
+
+                if ( !pokemon ) {
+                    app.broadcast( "labyrinth-alert", {
+                        alertHtml: alerts.labyrinthWinner( utf8Data.data.userstate, config.items[ app.config.auth.theme ] )
+                    });
+
+                } else {
+                    // lager.data( pokemon );
+                    app.broadcast( "labyrinth-alert", {
+                        alertImg: pokemon.ThumbnailImage,
+                        alertHtml: alerts.labyrinthPokedex( utf8Data.data.userstate, pokemon.name )
+                    });
+                }
             });
         }
     });

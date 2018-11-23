@@ -107,6 +107,7 @@ const labyrinth = {
                     this.hero.sprite.removeClass( "walk" );
                     this.isMoving = false;
                     socket.emit( "labyrinth-moved", data );
+                    // socket.emit( "labyrinth-winner", data );
 
                 // walk it out
                 } else {

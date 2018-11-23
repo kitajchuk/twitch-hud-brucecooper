@@ -8,6 +8,7 @@ const lager = require( "properjs-lager" );
 const files = require( "../files" );
 const jsonFile = path.join( __dirname, "../../json/labyrinth.json" );
 const alerts = require( "../alerts" );
+const request = require( "request-promise" );
 
 
 
@@ -32,6 +33,7 @@ module.exports = {
     init ( app ) {
         this.app = app;
         this.app.lager.template( `[${this.name}] command initialized` );
+        this.memo.mo
     },
 
     exec ( client, bot, channel, userstate, message, self, tmi ) {
@@ -71,34 +73,54 @@ module.exports = {
         });
     },
 
-    update ( data ) {
-        // Enable new command to come in
+    reset () {
         this.memo.moving = false;
     },
 
     winner ( data ) {
-        const entry = this.memo.json.find(( entry ) => {
-            return (entry.userstate.username === data.userstate.username);
-        });
-
-        // Push new entry
-        if ( !entry ) {
-            this.memo.json.push({
-                userstate: data.userstate,
-                labyrinths: 1
+        return new Promise(( resolve, reject ) => {
+            let entry = this.memo.json.find(( entry ) => {
+                return (entry.userstate.username === data.userstate.username);
             });
+            let index = 0;
 
-            files.write( jsonFile, this.memo.json, false );
+            // Push new entry
+            if ( !entry ) {
+                entry = {
+                    userstate: data.userstate,
+                    labyrinths: 1,
+                    pokedex: []
+                };
 
-        // Update existing entry
-        } else {
-            const index = this.memo.json.indexOf( entry );
+            // Update existing entry
+            } else {
+                index = this.memo.json.indexOf( entry );
+                entry.labyrinth++;
+            }
 
-            entry.labyrinth++;
+            // Add Pokemon?
+            if ( this.app.config.auth.theme === "pokemon" ) {
+                request({
+                    url: "https://www.pokemon.com/us/api/pokedex/kalos",
+                    json: true
 
-            this.memo.json[ index ] = entry;
+                }).then(( json ) => {
+                    const pokemon = json[ Math.floor( Math.random() * json.length ) ];
 
-            files.write( jsonFile, this.memo.json, false );
-        }
+                    entry.pokedex.push( pokemon );
+                    this.memo.json[ index ] = entry;
+                    files.write( jsonFile, this.memo.json, false );
+                    this.memo.moving = false;
+
+                    resolve( pokemon );
+                });
+
+            } else {
+                this.memo.json[ index ] = entry;
+                files.write( jsonFile, this.memo.json, false );
+                this.memo.moving = false;
+                resolve( null );
+            }
+        });
     }
 };

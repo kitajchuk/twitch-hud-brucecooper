@@ -259,7 +259,7 @@ body {
  * HUD Alerts
 *******************************************************************************/
 .hud__alert {
-    align-items: flex-start;
+    align-items: center;
     background-color: $black075;
     border-radius: 200px;
     display: flex;
@@ -314,11 +314,25 @@ body {
 .hud__alert__msg,
 .hud__alert__icon {
     display: inline-block;
-    vertical-align: top;
+    vertical-align: middle;
 }
 .hud__alert__icon {
     height: 128px;
     margin-right: 20px;
     width: 128px;
-        display: none;
+    position: relative;
+    display: none;
+
+    .is-image & {
+        display: block;
+    }
+}
+.hud__alert__img {
+    display: block;
+    width: 215px;
+    height: 215px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate3d( -65%, -50%, 0 );
 }
