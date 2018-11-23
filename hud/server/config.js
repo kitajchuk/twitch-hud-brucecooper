@@ -12,8 +12,8 @@ module.exports = {
         theme: ""
     },
     hud: {
-        port: 5050,
-        local: "http://localhost:5050",
+        port: 8000,
+        local: "http://localhost:8000",
         live: "http://labyrinth.kitajchuk.com",
         secret: "listen"
     },
