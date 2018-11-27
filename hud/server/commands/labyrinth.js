@@ -95,7 +95,7 @@ module.exports = {
             // Update existing entry
             } else {
                 index = this.memo.json.indexOf( entry );
-                entry.labyrinth++;
+                entry.labyrinths++;
             }
 
             // Add Pokemon?
