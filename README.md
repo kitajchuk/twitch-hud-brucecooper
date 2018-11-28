@@ -9,7 +9,7 @@ twitch-labyrinth
 
 In order to use the Twitch Labyrinth with your channel you simply need to get a tmi.js Oauth token:
 
-[Click here to get a token](http://twitchapps.com/tmi/){:target="_blank"}
+<a href="http://twitchapps.com/tmi/" target="_blank">Click here to get a token</a>
 
 Once you have your Oauth token you can use the Labyrinth in an OBS browser source with the following URL format:
 
@@ -31,4 +31,4 @@ The Twitch Labyrinth parses simple directional commands from your chat. You can 
 
 The homepage for the Twitch Labyrinth shows a breakdown of players per channel. You can see the number of labyrinth's the player has completed along with the status of their Pokedex.
 
-[http://labyrinth.kitajchuk.com](http://labyrinth.kitajchuk.com){:target="_blank"}
+<a href="http://labyrinth.kitajchuk.com" target="_blank">http://labyrinth.kitajchuk.com</a>
