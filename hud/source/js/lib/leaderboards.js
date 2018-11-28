@@ -11,15 +11,16 @@ const leaderboards = {
     },
 
     push ( data ) {
-        this.leaders.append( this.render( data ) );
+        if ( data.leaders.length ) {
+            this.leaders.append( this.render( data ) );
+        }
     },
 
     render ( data ) {
-        console.log( data );
         return `
             <div class="leaderboards__tables__board">
                 <div class="leaderboards__tables__row">
-                    <a href="https://twitch.tv/${data.channel}" target="_blank"><h1>#${data.channel}</h1></a>
+                    <a href="https://twitch.tv/${data.channel}" target="_blank"><h1>Labyrinth leaders for <span class="teal">${data.channel}</span> channel.</h1></a>
                 </div>
                 <div class="leaderboards__tables__row">
                     <div class="leaderboards__tables__cel">
@@ -36,7 +37,7 @@ const leaderboards = {
                     return `
                         <div class="leaderboards__tables__row">
                             <div class="leaderboards__tables__cel">
-                                <a href="https://twitch.tv/${leader.userstate.username}" class="teal" target="_blank"><p>#${leader.userstate.username}</p></a>
+                                <a href="https://twitch.tv/${leader.userstate.username}" class="teal" target="_blank"><p>${leader.userstate.username}</p></a>
                             </div>
                             <div class="leaderboards__tables__cel">
                                 <p>${leader.labyrinths}</p>

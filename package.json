@@ -9,6 +9,7 @@
     "scripts": {
         "start": "./node_modules/.bin/nodemon -i ./hud/source -i ./hud/public -i ./hud/views -i ./hud/json -i ./node_modules ./hud/main.js",
         "start:prod": "./node_modules/.bin/pm2 -a -p pid.log -l pm2.log -o out.log -e err.log start ./hud/main.js",
+        "stop": "./node_modules/.bin/pm2 stop 'all'",
         "build": "./node_modules/.bin/webpack --env.production --progress --profile --display-modules --colors",
         "watch": "./node_modules/.bin/webpack --env.sandbox --hide-modules --colors --watch",
         "deploy": "rsync -av -e 'ssh' --rsync-path 'sudo rsync' hud package.json ec2-user@54.69.44.146:/var/www/html/",

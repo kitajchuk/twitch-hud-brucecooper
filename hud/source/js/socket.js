@@ -41,7 +41,7 @@ const socket = {
             }
         };
         this.websocket.onopen = () => {
-            if ( this.params.clientId && this.params.token && this.params.channel && this.params.theme ) {
+            if ( this.params.token && this.params.channel && this.params.theme ) {
                 this.app.alert = alert.init();
                 this.app.labyrinth = labyrinth.init();
                 this.emit( "labyrinth-authorize", this.params );

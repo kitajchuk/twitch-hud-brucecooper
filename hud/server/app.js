@@ -35,7 +35,7 @@ app.express.use( express.static( path.join( __dirname, "../public" ) ) );
 
 // {app} Express routes
 app.express.get( "/", ( req, res, next ) => {
-    if ( req.query.clientId && req.query.channel && req.query.token && req.query.theme ) {
+    if ( req.query.channel && req.query.token && req.query.theme ) {
         next();
 
     } else {
