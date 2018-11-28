@@ -20,9 +20,9 @@ const leaderboards = {
         return `
             <div class="leaderboards__tables__board">
                 <div class="leaderboards__tables__row">
-                    <a href="https://twitch.tv/${data.channel}" target="_blank"><h1>Labyrinth leaders for <span class="teal">${data.channel}</span> channel.</h1></a>
+                    <a href="https://twitch.tv/${data.channel}" target="_blank"><h1>Leaders for <span class="teal">${data.channel}</span> channel.</h1></a>
                 </div>
-                <div class="leaderboards__tables__row">
+                <div class="leaderboards__tables__row yellow">
                     <div class="leaderboards__tables__cel">
                         <p>Username</p>
                     </div>

@@ -1,7 +1,7 @@
 {
-    "name": "twitch-hud-labyrinth",
-    "productName": "Twitch Hud Labyrinth",
-    "description": "Custom Twitch HUD Labyrinth game.",
+    "name": "twitch-labyrinth",
+    "productName": "Twitch Labyrinth",
+    "description": "A theme based labyrinth navigated by your Twitch Chat!",
     "version": "1.0.0",
     "author": "Brandon Lee Kitajchuk",
     "private": true,
@@ -16,7 +16,7 @@
         "connect": "ssh ec2-user@54.69.44.146",
         "postinstall": "cd ./node_modules/properjs-hobo && npm install && npm run build -- 'is eq not one next prev attr last first index parent filter detach append remove trigger prepend closest children removeAttr toggleClass'"
     },
-    "repository": "git@github.com:kitajchuk/twitch-hud-labyrinth.git",
+    "repository": "git@github.com:kitajchuk/twitch-labyrinth.git",
     "license": "CC0-1.0",
     "contributors": [
         {

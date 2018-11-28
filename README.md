@@ -1,22 +1,34 @@
-twitch-hud-labyrinth
-====================
+twitch-labyrinth
+================
 
-> Custom Twitch HUD labyrinth.
-
-
-
-### Twitch HUD commands
-
-* `!left`: Maze Runner: Move the green block through the maze to the yellow block.
-* `!up`: Maze Runner: Move the green block through the maze to the yellow block.
-* `!right`: Maze Runner: Move the green block through the maze to the yellow block.
-* `!down`: Maze Runner: Move the green block through the maze to the yellow block.
+> A theme based labyrinth navigated by your Twitch Chat!
 
 
 
-### Twitch API resources
+## Setup for your Twitch channel
 
-* [Twitch Developer Platform Roadmap](https://trello.com/b/xdoVhmKj/twitch-developer-platform-roadmap)
-* [New Twitch API ( helix )](https://dev.twitch.tv/docs/api)
-* [Old V5 API ( kraken )](https://dev.twitch.tv/docs/v5)
-* [TMI Client](https://www.tmijs.org)
+In order to use the Twitch Labyrinth with your channel you simply need to get a tmi.js Oauth token:
+
+[Click here to get a token](http://twitchapps.com/tmi/){:target="_blank"}
+
+Once you have your Oauth token you can use the Labyrinth in an OBS browser source with the following URL format:
+
+`http://labyrinth.kitajchuk.com?channel=youchannel&token=youroauthtoken&theme=pokemon`
+
+The available themes are `pokemon` and `zelda`. When using the Pokemon theme your chat users will build up their individual Pokedex's as they complete labyrinth's on your stream.
+
+The web app renders within a static 1920x1080 canvas so it is optimized for streaming.
+
+
+
+## Commanding the labyrinth player
+
+The Twitch Labyrinth parses simple directional commands from your chat. You can use `!left`, `!right`, `!up` and `!down` to move the player through the labyrinth. Each command will move the player one tile in the direction of the command. To move more than one tile at a time you can use a numerator with your direction in either of the following formats, and for any direction: `!left5` or `!left 5`.
+
+
+
+## Global Leaderboards
+
+The homepage for the Twitch Labyrinth shows a breakdown of players per channel. You can see the number of labyrinth's the player has completed along with the status of their Pokedex.
+
+[http://labyrinth.kitajchuk.com](http://labyrinth.kitajchuk.com){:target="_blank"}
