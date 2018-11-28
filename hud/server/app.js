@@ -1,19 +1,14 @@
-// Load system
 const path = require( "path" );
 const http = require( "http" );
-
-// Load registry
-const lager = require( "properjs-lager" );
 const request = require( "request-promise" );
 const express = require( "express" );
+const config = require( "./config" );
+const lager = require( "properjs-lager" );
 const WebSocketServer = require( "websocket" ).server;
 const WebSocketClient = require( "websocket" ).client;
-const crypto = require( "crypto" );
+const Labyrinth = require( "./client/Labyrinth" );
+const Leaderboards = require( "./client/Leaderboards" );
 
-// Load lib
-const twitch = require( "./twitch/index" );
-const alerts = require( "./alerts" );
-const config = require( "./config" );
 
 // This {app}
 const app = {};
@@ -21,51 +16,11 @@ const app = {};
 
 
 // {app} Config
-app.commands = require( "./commands/index" );
-app.twitch = twitch;
-app.lager = lager;
 app.config = config;
-app.alerts = alerts;
-app.connections = [];
+app.connections = {};
 app.init = () => {
-    // Initialize commands
-    app.commands.forEach(( command ) => {
-        command.init( app );
-    });
-
-    // Initialize alerts
-    alerts.init( app );
-
     // Initialize server
     app.server.listen( config.hud.port );
-};
-app.getCommand = ( comm ) => {
-    return app.commands.find(( command ) => {
-        return (command.name === comm);
-    });
-};
-app.runCommand = ( comm, message ) => {
-    return new Promise(( resolve, reject ) => {
-        app.commands.forEach(( command ) => {
-            const match = message.match( command.regex );
-
-            if ( match && command.name === comm ) {
-                resolve({
-                    match
-                });
-            }
-        });
-    });
-};
-app.broadcast = ( event, data ) => {
-    if ( app.connections.length ) {
-        app.connections.forEach(( connection ) => {
-            connection.send(JSON.stringify({
-                event,
-                data
-            }));
-        });
-    }
 };
 
 
@@ -80,11 +35,7 @@ app.express.use( express.static( path.join( __dirname, "../public" ) ) );
 
 // {app} Express routes
 app.express.get( "/", ( req, res, next ) => {
-    if ( req.query.channel && req.query.token && req.query.theme ) {
-        app.config.auth.userName = req.query.channel;
-        app.config.auth.userChannel = `#${req.query.channel}`;
-        app.config.auth.userToken = req.query.token;
-        app.config.auth.theme = req.query.theme;
+    if ( req.query.clientId && req.query.channel && req.query.token && req.query.theme ) {
         next();
 
     } else {
@@ -93,7 +44,7 @@ app.express.get( "/", ( req, res, next ) => {
 
 }, ( req, res ) => {
     res.render( "labyrinth", {
-        theme: app.config.auth.theme
+        theme: req.query.theme
     });
 });
 
@@ -110,61 +61,50 @@ app.websocketserver = new WebSocketServer({
     autoAcceptConnections: false
 });
 app.websocketserver.on( "request", ( request ) => {
-    lager.cache( `[socketserver] requested ${request.origin}` );
+    lager.cache( `[socketserver] Requested by ${request.origin}` );
 
     if ( request.origin === config.hud.local || request.origin === config.hud.live ) {
         request.accept( "echo-protocol", request.origin );
 
-        twitch.tmi.init( app );
+        lager.cache( `[socketserver] Accepted origin ${request.origin}` );
     }
 });
 app.websocketserver.on( "connect", ( connection ) => {
-    lager.cache( `[socketserver] connected` );
-
-    app.connections.push( connection );
-
-    app.getCommand( "labyrinth" ).reset();
-    app.broadcast( "labyrinth-render", {} );
-    app.broadcast( "labyrinth-alert", {
-        alertHtml: alerts.labyrinthRender( config.items[ app.config.auth.theme ] )
-    });
+    lager.cache( `[socketserver] Connected` );
 
     connection.on( "message", ( message ) => {
         // { event, data }
         const utf8Data = JSON.parse( message.utf8Data );
 
-        if ( utf8Data.event === "labyrinth-moved" ) {
-            app.getCommand( "labyrinth" ).reset();
+        // Authorize a client connection
+        if ( utf8Data.event === "labyrinth-authorize" ) {
+            // Allow authorization for channel IF NOT EXISTS
+            if ( !app.connections[ utf8Data.data.channel ] ) {
+                connection._channel = utf8Data.data.channel;
 
-        } if ( utf8Data.event === "labyrinth-winner" ) {
-            app.getCommand( "labyrinth" ).winner( utf8Data.data ).then(( pokemon ) => {
-                app.broadcast( "labyrinth-alert", {
-                    alertInfo: true,
-                    alertHtml: `<p>Waiting for players&hellip;</p>`
-                });
+                app.connections[ utf8Data.data.channel ] = {
+                    clientId: utf8Data.data.clientId,
+                    channel: utf8Data.data.channel,
+                    token: utf8Data.data.token,
+                    theme: utf8Data.data.theme,
+                    labyrinth: new Labyrinth( utf8Data.data, connection ),
+                    connection,
+                };
 
-                if ( !pokemon ) {
-                    app.broadcast( "labyrinth-alert", {
-                        alertHtml: alerts.labyrinthWinner( utf8Data.data.userstate, config.items[ app.config.auth.theme ] )
-                    });
+            // Ignore ALREADY CONNECTED CHANNEL
+            } else {
+                lager.cache( `[socketserver] Ignoring already active channel #${utf8Data.data.channel}` );
+            }
 
-                } else {
-                    // lager.data( pokemon );
-                    app.broadcast( "labyrinth-alert", {
-                        alertImg: pokemon.ThumbnailImage,
-                        alertHtml: alerts.labyrinthPokedex( utf8Data.data.userstate, pokemon.name )
-                    });
-                }
-            });
+        } else if ( utf8Data.event === "labyrinth-leaderboards" ) {
+            new Leaderboards( connection );
         }
     });
 });
 app.websocketserver.on( "close", ( connection ) => {
-    lager.cache( `[socketserver] closed` );
+    lager.cache( `[socketserver] Closed, deleting connection for #${connection._channel}` );
 
-    app.connections.splice( app.connections.indexOf( connection ), 1 );
-
-    lager.info( `app.connections.length: ${app.connections.length}` );
+    delete app.connections[ connection._channel ];
 });
 
 

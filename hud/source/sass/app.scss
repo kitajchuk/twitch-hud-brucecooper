@@ -26,6 +26,19 @@ body {
     height: 100%;
     width: 100%;
     background-color: $black;
+    color: $white;
+    font-family: "Calamity-Bold";
+    font-size: 22px;
+    line-height: 1.5;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-size: 28px;
+}
+h2, h3, h4, h5, h6 {
+    font-size: 24px;
+}
+.mono {
+    font-family: monospace;
 }
 
 
@@ -76,15 +89,55 @@ body {
 
 
 /******************************************************************************
+ * Leaderboards
+*******************************************************************************/
+.leaderboards__masthead {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: space-between;
+    padding: 100px 6vw;
+}
+.leaderboards__tables {
+    padding: 100px 6vw;
+}
+.leaderboards__tables__board {
+    outline: 1px solid $white;
+    margin-bottom: 60px;
+
+    h1 {
+        padding: 30px;
+    }
+}
+.leaderboards__tables__row {
+    display: table;
+    width: 100%;
+
+    & + .leaderboards__tables__row {
+        border-top: 1px solid $white;
+    }
+}
+.leaderboards__tables__cel {
+    width: 33.333333%;
+    padding: 30px;
+    display: table-cell;
+    text-align: center;
+
+    &:first-child {
+        text-align: left;
+    }
+
+    & + .leaderboards__tables__cel {
+        border-left: 1px solid $white;
+    }
+}
+
+
+
+/******************************************************************************
  * HUD
 *******************************************************************************/
 .hud {
-    // Typography
-    color: $white;
-    font-family: "Calamity-Bold";
-    font-size: 22px;
-    line-height: 1.5;
-
     // Gameplay
     background-color: $black;
     box-shadow: 0 0 10px 5px rgba( 0, 0, 0, 0.25 );
@@ -96,17 +149,6 @@ body {
     width: 1920px;
     z-index: 1;
     pointer-events: none;
-
-    h1, h2, h3, h4, h5, h6 {
-        font-size: 28px;
-    }
-    h2, h3, h4, h5, h6 {
-        font-size: 24px;
-    }
-
-    .mono {
-        font-family: monospace;
-    }
 
     &[data-theme="pokemon"] {
         .hud__hero:after {

@@ -1,6 +1,7 @@
-// import $ from "properjs-hobo";
+import paramalama from "paramalama";
 import labyrinth from "./lib/labyrinth";
 import alert from "./lib/alert";
+import leaderboards from "./lib/leaderboards";
 
 
 
@@ -8,6 +9,7 @@ const socket = {
     init ( app ) {
         this.app = app;
         this.websocket = new window.WebSocket( `ws://${window.location.host}`, "echo-protocol" );
+        this.params = paramalama( window.location.search );
         this.bind();
 
         return this;
@@ -33,11 +35,21 @@ const socket = {
 
             } else if ( response.event === "labyrinth-alert" ) {
                 alert.push( response.data );
+
+            } else if ( response.event === "labyrinth-leaderboards" ) {
+                leaderboards.push( response.data );
             }
         };
         this.websocket.onopen = () => {
-            this.app.alert = alert.init();
-            this.app.labyrinth = labyrinth.init();
+            if ( this.params.clientId && this.params.token && this.params.channel && this.params.theme ) {
+                this.app.alert = alert.init();
+                this.app.labyrinth = labyrinth.init();
+                this.emit( "labyrinth-authorize", this.params );
+
+            } else {
+                this.app.leaderboards = leaderboards.init();
+                this.emit( "labyrinth-leaderboards", {} );
+            }
         };
         this.websocket.onclose = () => {};
     }
