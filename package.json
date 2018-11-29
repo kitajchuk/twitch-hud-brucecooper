@@ -7,14 +7,15 @@
     "private": true,
     "main": "hud/main.js",
     "scripts": {
-        "start": "./node_modules/.bin/nodemon -i ./hud/source -i ./hud/public -i ./hud/views -i ./hud/json -i ./node_modules ./hud/main.js",
+        "postinstall": "cd ./node_modules/properjs-hobo && npm install && npm run build -- 'is eq not one next prev attr last first index parent filter detach append remove trigger prepend closest children removeAttr toggleClass'",
+        "start": "./node_modules/.bin/nodemon -i ./hud/source -i ./hud/public -i ./hud/views -i ./json -i ./node_modules -i ./config.js ./hud/main.js",
         "start:prod": "./node_modules/.bin/pm2 -a -p pid.log -l pm2.log -o out.log -e err.log start ./hud/main.js",
         "stop": "./node_modules/.bin/pm2 stop 'all'",
         "build": "./node_modules/.bin/webpack --env.production --progress --profile --display-modules --colors",
         "watch": "./node_modules/.bin/webpack --env.sandbox --hide-modules --colors --watch",
-        "deploy": "rsync -av -e 'ssh' --rsync-path 'sudo rsync' hud package.json ec2-user@54.69.44.146:/var/www/html/",
         "connect": "ssh ec2-user@54.69.44.146",
-        "postinstall": "cd ./node_modules/properjs-hobo && npm install && npm run build -- 'is eq not one next prev attr last first index parent filter detach append remove trigger prepend closest children removeAttr toggleClass'"
+        "deploy": "rsync -av -e 'ssh' --rsync-path 'sudo rsync' hud config.js package.json ec2-user@54.69.44.146:/var/www/html/",
+        "postdeploy": "ssh ec2-user@54.69.44.146 'cd /var/www/html/ ; sudo npm run stop ; sudo npm run start:prod'"
     },
     "repository": "git@github.com:kitajchuk/twitch-labyrinth.git",
     "license": "CC0-1.0",

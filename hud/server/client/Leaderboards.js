@@ -8,7 +8,7 @@ const files = require( "../lib/files" );
 class Leaderboards {
     constructor ( connection ) {
         this.connection = connection;
-        this.directory = path.join( __dirname, `../../json` );
+        this.directory = path.join( __dirname, `../../../json` );
 
         this.init();
         this.process();

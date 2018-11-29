@@ -4,7 +4,7 @@ const fs = require( "fs" );
 const lager = require( "properjs-lager" );
 const files = require( "../lib/files" );
 const request = require( "request-promise" );
-const clientId = require( "../client-id" );
+const config = require( "../../../config" );
 const alerts = {
     render ( item ) {
         return `
@@ -50,11 +50,11 @@ class Labyrinth {
         this.connection = connection;
         this.regex = /^\!(left|right|up|down)$|^\!(left|right|up|down)(\d{1,})$|^\!(left|right|up|down)\s(\d{1,})$/;
         this.moving = false;
-        this.filepath = path.join( __dirname, `../../json/${this.data.channel}.json` );
+        this.filepath = path.join( __dirname, `../../../json/${this.data.channel}.json` );
 
         if ( !fs.existsSync( this.filepath ) ) {
-            files.write( this.filepath, [], false );
             this.json = [];
+            files.write( this.filepath, this.json, false );
 
         } else {
             this.json = files.read( this.filepath, true );
@@ -68,7 +68,7 @@ class Labyrinth {
     init () {
         this.tmi = new tmi.client({
             options: {
-                clientId,
+                clientId: config.clientId,
             },
             connection: {
                 reconnect: true
@@ -177,13 +177,18 @@ class Labyrinth {
 
     winner ( data ) {
         return new Promise(( resolve, reject ) => {
+            // Fresh read of JSON
+            this.json = files.read( this.filepath, true );
+
             let entry = this.json.find(( entry ) => {
                 return (entry.userstate.username === data.userstate.username);
             });
             let index = 0;
+            let isPush = false;
 
             // Push new entry
             if ( !entry ) {
+                isPush = true;
                 entry = {
                     userstate: data.userstate,
                     labyrinths: 1,
@@ -197,28 +202,27 @@ class Labyrinth {
             }
 
             // Add Pokemon?
-            if ( this.data.theme === "pokemon" ) {
-                request({
-                    url: "https://www.pokemon.com/us/api/pokedex/kalos",
-                    json: true
+            request({
+                url: "https://www.pokemon.com/us/api/pokedex/kalos",
+                json: true
 
-                }).then(( json ) => {
-                    const pokemon = json[ Math.floor( Math.random() * json.length ) ];
+            }).then(( json ) => {
+                const pokemon = json[ Math.floor( Math.random() * json.length ) ];
 
-                    entry.pokedex.push( pokemon );
+                entry.pokedex.push( pokemon );
+
+                if ( isPush ) {
+                    this.json.push( entry );
+
+                } else {
                     this.json[ index ] = entry;
-                    files.write( this.filepath, this.json, false );
-                    this.moving = false;
+                }
 
-                    resolve( pokemon );
-                });
-
-            } else {
-                this.json[ index ] = entry;
                 files.write( this.filepath, this.json, false );
                 this.moving = false;
-                resolve( null );
-            }
+
+                resolve( pokemon );
+            });
         });
     }
 
