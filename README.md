@@ -7,15 +7,15 @@ twitch-labyrinth
 
 ## Setup for your Twitch channel
 
-In order to use the Twitch Labyrinth with your channel you simply need to get a tmi.js Oauth token:
+In order to use the Twitch Labyrinth with your channel you simply need to get a [tmi.js](https://docs.tmijs.org) Oauth token:
 
 <a href="http://twitchapps.com/tmi/" target="_blank">Click here to get a token</a>
 
 Once you have your Oauth token you can use the Labyrinth in an OBS browser source with the following URL format:
 
-`http://labyrinth.kitajchuk.com?channel=youchannel&token=youroauthtoken&theme=pokemon`
+`http://labyrinth.kitajchuk.com?channel=yourchannel&token=youroauthtoken&theme=pokemon`
 
-The available themes are `pokemon` and `zelda`. When using the Pokemon theme your chat users will build up their individual Pokedex's as they complete labyrinth's on your stream.
+The available themes are `pokemon` and `zelda`. Your chat users will build up their individual Pokedex's as they complete labyrinth's on your stream. Yes, even Link has gotta catch em all in this whacky game!
 
 The web app renders within a static 1920x1080 canvas so it is optimized for streaming.
 
